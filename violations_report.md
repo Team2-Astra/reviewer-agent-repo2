@@ -67,12 +67,13 @@ This OTA implementation demonstrates three core vectors of non-compliance under 
 
 When building your compliance scanner demo, you can feed these target definitions into your detection rules:
 
-| ID | Violation Title | UU PDP Reference | Target Code Snippet / AST Pattern | Severity |
+| ID | Violation Title | UU PDP Reference / Type | Target Code Snippet / AST Pattern | Severity |
 | :--- | :--- | :--- | :--- | :--- |
 | **PDP-001** | Unauthorized Telemetry | Pasal 20, 22 | Harvesting device variables (`socket.gethostname()`, `getpass.getuser()`, `uuid.getnode()`) outside of an explicitly declared configuration or consent state. | **MEDIUM** |
 | **PDP-002** | Insecure Transport (HTTP) | Pasal 35, 39 | Network requests targeting endpoints starting with `"http://"` containing string keys like `"gps"`, `"mac"`, `"user"`. | **HIGH** |
 | **PDP-003** | Insecure Remote Execution | Pasal 35, 39 | `subprocess.run` or `exec()` targeting downloaded web assets without cryptographic signature verification. | **CRITICAL** |
 | **PDP-004** | Plaintext PII Storage | Pasal 43, 44 | Server-side saving of raw system fields and location data to local disk (`.csv` / `.log`) without hashing/encryption or TTL mechanism. | **HIGH** |
+| **SCA-001** | Deprecated / Vulnerable Packages | Dependency Vulnerability (SCA) | `package.json` dependencies targeting `"request"` (deprecated) or vulnerable versions like `"lodash": "4.17.15"`, `"minimist": "1.2.0"`, `"express": "4.16.0"`. | **HIGH** |
 
 ---
 
@@ -81,3 +82,7 @@ When building your compliance scanner demo, you can feed these target definition
 1.  **Phase 1 (Network Scanning):** Run your scanner as a local gateway or proxy. Launch `server.py` and `client.py`. Your scanner should intercept the port `8080` check-in request and raise **PDP-002** due to plain text telemetry transmission of GPS and MAC addresses.
 2.  **Phase 2 (Static Code Analysis):** Point your static scanner at `client.py`. It should look for execution sinks (`subprocess.run([sys.executable, DOWNLOADED_PAYLOAD_PATH])`) and trace the source of that file to an insecure network request (`urllib.request.urlopen`), triggering **PDP-003** (RCE via unsigned update download).
 3.  **Phase 3 (Data Inventory Scan):** Point your scanner at the server directory. It should find `harvested_user_data.csv` containing plaintext user names, locations, and IPs, triggering **PDP-004** (plaintext unencrypted PII store).
+4.  **Phase 4 (Software Composition Analysis - SCA):** Point your dependency scanner at [package.json](file:///Users/agrottoh6655/.gemini/antigravity/scratch/indonesia-ota-pdp-violation/package.json). It should flag:
+    *   **Deprecation Warning:** Package `request` is deprecated.
+    *   **Vulnerability Detections (CVEs):** Critical vulnerabilities in `lodash` (Prototype Pollution - CVE-2020-8203), `minimist` (Prototype Pollution - CVE-2020-7598), and outdated `express` (SCA-001).
+

@@ -1,0 +1,24 @@
+{
+  "name": "indonesia-ota-pdp-violation-demo",
+  "version": "1.0.0",
+  "description": "Mock OTA update system with deliberate UU PDP violations and vulnerable/deprecated Node.js dependencies for scanner testbed.",
+  "main": "client/client.py",
+  "scripts": {
+    "start-server": "python3 server/server.py",
+    "start-client": "python3 client/client.py"
+  },
+  "keywords": [
+    "ota",
+    "pdp-violation",
+    "vulnerability-demo",
+    "compliance-scanner-testbed"
+  ],
+  "author": "Astra International - Reviewer Team",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.88.2",
+    "lodash": "4.17.15",
+    "minimist": "1.2.0",
+    "express": "4.16.0"
+  }
+}
